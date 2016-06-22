@@ -15,7 +15,8 @@
         android:text="Start Service"
         android:id="@+id/startButton"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="86dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -23,6 +24,34 @@
         android:text="Stop Service"
         android:id="@+id/stopButton"
         android:layout_below="@+id/startButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp" />
+        android:layout_alignStart="@+id/startButton"
+        android:layout_marginTop="50dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:id="@+id/settingsButton"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/stopButton"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="GPS Tracker V1.0"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Service: Running"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

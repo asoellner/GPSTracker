@@ -63,6 +63,25 @@ public class MainActivity extends AppCompatActivity {
 
 
         });
+
+
+
+
+        Button settingsButton = (Button) findViewById(R.id.settingsButton);
+        assert settingsButton != null;
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+
+                startActivity(intent);
+
+
+            }
+
+
+        });
+
+
         if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,
@@ -74,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
         GPSTracker gps = new GPSTracker(locationManager, getBaseContext());
         // check if GPS enabled
-        if (gps.canGetLocation()) {
+        if (gps.canGetLocation() && gps.getLatitude() != 0.0) {
             _latitude = gps.getLatitude();
             _longitude = gps.getLongitude();
 
-          // new UploadLocation().execute();
+            // new UploadLocation().execute();
 
 
             //tv.setText("Latitude:" + latitude + ", Longitude:" + longitude);
