@@ -18,6 +18,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -41,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
     //private String SERVER_URL="http://192.168.1.124:8080/SampleApp/greeting/crunchifyService";
 
     //henny
-    private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/print";
+    private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/checkLogin";
 
     //work
     //private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/crunchifyService";
@@ -122,46 +132,42 @@ public class SettingsActivity extends AppCompatActivity {
                     REQUEST_PERMISSION);
         }
 
+        boolean success = false;
 
-        HttpURLConnection urlConnection = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost post = new HttpPost(SERVER_URL);
+        post.setHeader("content-type", "application/json");
+
+
+        //Construimos el objeto cliente en formato JSON
+        JSONObject dato = new JSONObject();
         try {
-            // create connection
-            URL urlToRequest = new URL(SERVER_URL);
-            urlConnection = (HttpURLConnection)
-                    urlToRequest.openConnection();
-            urlConnection.setConnectTimeout(2000);
-            urlConnection.setReadTimeout(5000);
+            dato.put("login", "alex");
+            dato.put("password", "huaba");
 
-            // handle issues
-            int statusCode = urlConnection.getResponseCode();
-            if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                // handle unauthorized (if service requires user login)
-            } else if (statusCode != HttpURLConnection.HTTP_OK) {
-                // handle any other errors, like 404, 500,..
-            }
 
-            // create JSON object from content
-            InputStream in = new BufferedInputStream(
-                    urlConnection.getInputStream());
-            JSONObject jsonObject = new JSONObject(getResponseText(in));
-            System.err.println("sss");
+            StringEntity entity = new StringEntity(dato.toString());
+            post.setEntity(entity);
 
-        } catch (MalformedURLException e) {
-            // URL is invalid
-        } catch (SocketTimeoutException e) {
-            // data retrieval or connection timed out
-        } catch (IOException e) {
-            // could not read response body
-            // (could not create input stream)
+            HttpResponse resp = httpClient.execute(post);
+            String respStr = EntityUtils.toString(resp.getEntity());
+
+            if (respStr.equals("ok"))
+                success = true;
+
+
         } catch (JSONException e) {
-            // response body is no valid JSON string
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return false;
+
+        return success;
     }
 
     private static String getResponseText(InputStream inStream) {
