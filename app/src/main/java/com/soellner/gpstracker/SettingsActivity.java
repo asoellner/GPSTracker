@@ -3,6 +3,7 @@ package com.soellner.gpstracker;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -11,7 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -51,10 +54,10 @@ public class SettingsActivity extends AppCompatActivity {
     //private String SERVER_URL="http://192.168.1.124:8080/SampleApp/greeting/crunchifyService";
 
     //henny
-    private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/checkLogin";
+    //private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/checkLogin";
 
     //work
-    //private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/crunchifyService";
+    private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/checkLogin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,11 +93,52 @@ public class SettingsActivity extends AppCompatActivity {
         testButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (testConnection()) {
-                    Toast.makeText(getApplicationContext(),
-                            "Test successfull", Toast.LENGTH_LONG).show();
+
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(SettingsActivity.this);
+                    alertDialog.setTitle("Test Connection");
+                    alertDialog.setMessage("Successfull");
+                    alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Editable ukucanoIme = input.getText();
+                            //finish();
+                        }
+                    });
+
+// Setting Negative "Cancel" Button
+                    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //finish();
+                            //dialog.cancel();
+                        }
+                    });
+
+                    alertDialog.show();
+
+                    //Toast.makeText(getApplicationContext(),
+                    //       "successfull", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Test NOT successfull", Toast.LENGTH_LONG).show();
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(SettingsActivity.this);
+                    alertDialog.setTitle("Test Connection");
+                    alertDialog.setMessage("not Successfull");
+                    alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Editable ukucanoIme = input.getText();
+                            //finish();
+                        }
+                    });
+
+// Setting Negative "Cancel" Button
+                    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                            dialog.cancel();
+                        }
+                    });
+
+                    alertDialog.show();
+
+                    //Toast.makeText(getApplicationContext(),
+                    //        "not successfull", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -138,12 +182,18 @@ public class SettingsActivity extends AppCompatActivity {
         HttpPost post = new HttpPost(SERVER_URL);
         post.setHeader("content-type", "application/json");
 
+        EditText usernameEditText = (EditText) findViewById(R.id.usernameEditText);
+        assert usernameEditText != null;
+        String username = usernameEditText.getText().toString();
 
+        EditText passwordEditText = (EditText) findViewById(R.id.passwordEditText);
+        assert passwordEditText != null;
+        String password = passwordEditText.getText().toString();
         //Construimos el objeto cliente en formato JSON
         JSONObject dato = new JSONObject();
         try {
-            dato.put("login", "alex");
-            dato.put("password", "huaba");
+            dato.put("username", username);
+            dato.put("password", password);
 
 
             StringEntity entity = new StringEntity(dato.toString());

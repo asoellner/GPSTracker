@@ -36,7 +36,7 @@ public class BootCompletedIntentReceiver extends WakefulBroadcastReceiver {
         } else if (SDK_INT >= Build.VERSION_CODES.M) {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pIntent);
         }
-        new SendStartingMailTask().execute();
+       // new SendStartingMailTask().execute();
 
 
         startWakefulService(context, srvIntent);

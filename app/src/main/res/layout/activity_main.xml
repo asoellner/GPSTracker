@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Service: Running"
-        android:id="@+id/textView2"
+        android:id="@+id/serviceStatusText"
         android:layout_below="@+id/textView"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true" />

@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -38,10 +39,10 @@ public class GPSTrackerService extends Service {
     //private String SERVER_URL="http://192.168.1.124:8080/SampleApp/greeting/crunchifyService";
 
     //henny
-    private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/saveLocation";
+    //private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/saveLocation";
 
     //work
-    //private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/crunchifyService";
+    private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
 
     public IBinder onBind(Intent intent) {
         // Fuer dieses Tutorial irrelevant. Gehoert zu bounded Services.
@@ -66,8 +67,7 @@ public class GPSTrackerService extends Service {
             GPSTracker gpsTracker = new GPSTracker(locationManager, getBaseContext());
 
 
-            if (gpsTracker.canGetLocation()) {
-
+            if (gpsTracker.canGetLocation() && gpsTracker.getLatitude() != 0.0) {
 
                 MyTaskParams params = new MyTaskParams(gpsTracker.getLatitude(), gpsTracker.getLongitude());
 
@@ -81,19 +81,9 @@ public class GPSTrackerService extends Service {
         }
 
 
-        new SendMail().execute();
+        //new SendMail().execute();
 
 
-/*
-
-        h.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getBaseContext(),"BUMMMM",Toast.LENGTH_LONG).show();
-            }
-        });
-
-*/
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -135,7 +125,6 @@ public class GPSTrackerService extends Service {
 
     private class UploadLocation extends AsyncTask<MyTaskParams, Void, Void> {
 
-        private byte[] _byteArray;
 
         @Override
         protected Void doInBackground(MyTaskParams... params) {
@@ -149,8 +138,11 @@ public class GPSTrackerService extends Service {
 
                 obj.put("latitude", latitude);
                 obj.put("longitude", longitude);
-                obj.put("userID", 0);
-
+                SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+                String username = settings.getString("Username", "");
+                String password = settings.getString("Password", "");
+                obj.put("username", username);
+                obj.put("password", password);
 
                 //URL url = new URL("http://192.168.1.124:8080/SampleApp/greeting/crunchifyService");
                 URL url = new URL(SERVER_URL);
