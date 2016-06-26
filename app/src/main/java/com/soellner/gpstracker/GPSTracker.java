@@ -21,6 +21,8 @@ import android.util.Log;
 public class GPSTracker extends Service implements LocationListener {
     static final int REQUEST_PERMISSION = 3;
 
+
+
     // flag for GPS status
     boolean isGPSEnabled = false;
     // flag for network status
@@ -36,7 +38,7 @@ public class GPSTracker extends Service implements LocationListener {
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
     // Declaring a Location Manager
     protected LocationManager _locationManager;
-   Context _context;
+    Context _context;
     public static final String BROADCAST_ACTION = "GPS Action";
 
 
@@ -159,9 +161,9 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location currentLocation) {
 // TODO Auto-generated method stub
-        this.location = currentLocation;
-        getLatitude();
-        getLongitude();
+       // this.location = currentLocation;
+       // getLatitude();
+       // getLongitude();
 
     }
 
@@ -179,5 +181,21 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onDestroy() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        _locationManager.removeUpdates(this);
+        super.onDestroy();
     }
 }

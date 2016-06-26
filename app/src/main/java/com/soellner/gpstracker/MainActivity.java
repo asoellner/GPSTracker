@@ -1,18 +1,26 @@
 package com.soellner.gpstracker;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.soellner.gpstracker.alert.GPSTrackerService;
 
 import org.json.JSONObject;
 
@@ -30,12 +38,17 @@ public class MainActivity extends AppCompatActivity {
     //private String SERVER_URL="http://192.168.1.124:8080/SampleApp/greeting/crunchifyService";
 
     //henny
-    private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/saveLocation";
+    //private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/saveLocation";
 
     //work
     //private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/crunchifyService";
 
+    //home server
+    private String SERVER_URL = "http://xxxx.dyndns.org:8080/SampleApp/greeting/saveLocation";
 
+
+
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +59,14 @@ public class MainActivity extends AppCompatActivity {
         assert startButton != null;
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startService(new Intent(getBaseContext(), GPSTrackerService.class));
+                SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("enableService", true);
+                TextView statusText = (TextView) findViewById(R.id.serviceStatusText);
+                statusText.setText("service running");
+                statusText.setTextColor(Color.parseColor("#00FF00"));
+                editor.apply();
+                startService(new Intent(getBaseContext(), GPSTracker.class));
 
             }
 
@@ -57,14 +77,21 @@ public class MainActivity extends AppCompatActivity {
         assert stopButton != null;
         stopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("enableService", false);
+                editor.apply();
+
+                TextView statusText = (TextView) findViewById(R.id.serviceStatusText);
+                statusText.setText("service stopped");
+                statusText.setTextColor(Color.parseColor("#FF0000"));
+
                 stopService(new Intent(getBaseContext(), GPSTrackerService.class));
 
             }
 
 
         });
-
-
 
 
         Button settingsButton = (Button) findViewById(R.id.settingsButton);
@@ -89,19 +116,17 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_PERMISSION);
         }
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        GPSTracker gps = new GPSTracker(locationManager, getBaseContext());
-        // check if GPS enabled
-        if (gps.canGetLocation() && gps.getLatitude() != 0.0) {
-            _latitude = gps.getLatitude();
-            _longitude = gps.getLongitude();
-
-            // new UploadLocation().execute();
 
 
-            //tv.setText("Latitude:" + latitude + ", Longitude:" + longitude);
-
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        boolean enableService = settings.getBoolean("enableService", false);
+        TextView statusText = (TextView) findViewById(R.id.serviceStatusText);
+        if (enableService) {
+            statusText.setText("service running");
+            statusText.setTextColor(Color.parseColor("#00FF00"));
+        } else {
+            statusText.setText("service stopped");
+            statusText.setTextColor(Color.parseColor("#FF0000"));
         }
 
 

@@ -1,4 +1,4 @@
-package com.soellner.gpstracker;
+package com.soellner.gpstracker.alert;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -20,6 +20,8 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+
+import com.soellner.gpstracker.GMailSender;
 
 import org.json.JSONObject;
 
@@ -60,8 +62,8 @@ public class GPSTrackerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-
-        try {
+        new SendMail().execute();
+       /* try {
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             GPSTracker gpsTracker = new GPSTracker(locationManager, getBaseContext());
@@ -79,7 +81,7 @@ public class GPSTrackerService extends Service {
             e.printStackTrace();
             System.err.println(e.getMessage());
         }
-
+*/
 
         //new SendMail().execute();
 
@@ -104,10 +106,10 @@ public class GPSTrackerService extends Service {
 
             try {
                 GMailSender sender = new GMailSender("", "!");
-                sender.sendMail("Send GPS!",
-                        "Successfull GPS send",
+                sender.sendMail("Trying to send GPS!",
+                        "Trying to send GPS",
                         "",
-                        "a");
+                        "");
             } catch (Exception e) {
                 Log.e("SendMail", e.getMessage(), e);
             }

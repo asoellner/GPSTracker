@@ -12,7 +12,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Service"
+        android:text="Enable Service"
         android:id="@+id/startButton"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -21,7 +21,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop Service"
+        android:text="Disable Service"
         android:id="@+id/stopButton"
         android:layout_below="@+id/startButton"
         android:layout_alignStart="@+id/startButton"
@@ -50,6 +50,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Service: Running"
+        android:textStyle="bold"
         android:id="@+id/serviceStatusText"
         android:layout_below="@+id/textView"
         android:layout_marginTop="10dp"
