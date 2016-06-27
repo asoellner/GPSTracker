@@ -50,7 +50,7 @@ public class GPSTracker extends Service implements
     // private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
 
     //work
-    private String SERVER_URL = "http://xxxx.dyndns.org:8080/SampleApp/greeting/saveLocation";
+    private String SERVER_URL = "http://bigbutt.dyndns.org:8080/SampleApp/greeting/saveLocation";
 
 
     private boolean currentlyProcessingLocation = false;
@@ -142,13 +142,14 @@ public class GPSTracker extends Service implements
         //only send GPS if location has changed
         if (uploadGPS) {
             uploadLocation(location);
+            GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
+            new SendStartingMailTask().execute(gpsInfos);
 
         } else {
             Log.d(TAG, "location not changed!");
         }
 
-        GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
-        new SendStartingMailTask().execute(gpsInfos);
+
 
     }
 
@@ -240,10 +241,10 @@ public class GPSTracker extends Service implements
                 String latitude = params[0]._latitude;
                 String longitude = params[0]._longitude;
 
-                GMailSender sender = new GMailSender("@.net", "!");
+                GMailSender sender = new GMailSender("@gmx.net", "!");
                 sender.sendMail("GPS Info send",
                         "Latidude: " + latitude + "  Longitude: " + longitude,
-                        "@.net",
+                        "@gmx.net",
                         "@-.");
             } catch (Exception e) {
                 Log.d("SendMail", e.getMessage(), e);
