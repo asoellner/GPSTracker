@@ -49,7 +49,7 @@ public class BootCompletedIntentReceiver extends WakefulBroadcastReceiver {
         //context.startService(pushIntent);
 
         Log.e("BootReceiver", "BootCompletedIntentReceiver.onReceive");
-        Intent gpsTrackerIntent = new Intent(context, GpsTrackerReceiver.class);
+        Intent gpsTrackerIntent = new Intent(context, GPSTracker.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, gpsTrackerIntent, 0);
 
         final int SDK_INT = Build.VERSION.SDK_INT;

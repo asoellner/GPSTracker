@@ -57,11 +57,9 @@
 
 
         <service
-            android:name=".alert.GPSTrackerService"
+            android:name=".alert.GPSTracker"
             android:enabled="true" />
-        <service
-            android:name="com.soellner.gpstracker.alert.GpsTrackerReceiver"
-            android:enabled="true" />
+
     </application>
 
 </manifest>

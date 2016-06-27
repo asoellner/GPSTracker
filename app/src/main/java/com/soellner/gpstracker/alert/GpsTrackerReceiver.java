@@ -24,7 +24,11 @@ public class GpsTrackerReceiver extends Service {
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e("GpsTrackerReceiver", "onStartCommand");
-        new SendStartingMailTask().execute();
+        //new SendStartingMailTask().execute();
+
+
+
+
         return START_NOT_STICKY;
     }
 
@@ -37,7 +41,7 @@ public class GpsTrackerReceiver extends Service {
                 GMailSender sender = new GMailSender("@.net", "!");
                 sender.sendMail("Service Running",
                         "Service running",
-                        "bigbutt@gmx.net",
+                        "",
                         "@-.");
             } catch (Exception e) {
                 Log.e("SendMail", e.getMessage(), e);
