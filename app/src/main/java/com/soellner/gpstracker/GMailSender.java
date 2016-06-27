@@ -1,6 +1,8 @@
 package com.soellner.gpstracker;
 
 
+import android.util.Log;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Authenticator;
@@ -27,6 +29,7 @@ public class GMailSender extends Authenticator {
     private String user;
     private String password;
     private Session session;
+    private static final String TAG = "SettingsActivity";
 
     static {
         Security.addProvider(new com.soellner.gpstracker.JSSEProvider());
@@ -48,7 +51,7 @@ public class GMailSender extends Authenticator {
                 "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.socketFactory.fallback", "false");
         props.setProperty("mail.smtp.quitwait", "false");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
 
         session = Session.getDefaultInstance(props, this);
     }
@@ -70,7 +73,7 @@ public class GMailSender extends Authenticator {
                 message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
             Transport.send(message);
         } catch (Exception e) {
-            System.err.println(e);
+            Log.e(TAG, "ERROR", e);
         }
     }
 

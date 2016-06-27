@@ -19,49 +19,54 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.soellner.gpstracker.GMailSender;
 
+import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class GPSTracker extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private static final String TAG = "LocationService";
+    private static final String TAG = "GPSTracker";
 
-    // use the websmithing defaultUploadWebsite for testing and then check your
-    // location with your browser here: https://www.websmithing.com/gpstracker/displaymap.php
-    private String defaultUploadWebsite;
+    //keller
+    //private String SERVER_URL="http://192.168.1.124:8080/SampleApp/greeting/crunchifyService";
+
+    //henny
+    //private String SERVER_URL = "http://192.168.1.139:8080/SampleApp/greeting/saveLocation";
+
+    //work
+    // private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
+
+    //work
+    private String SERVER_URL = "http://xxxx.dyndns.org:8080/SampleApp/greeting/saveLocation";
+
 
     private boolean currentlyProcessingLocation = false;
-    private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        //defaultUploadWebsite = getString(R.string.default_upload_website);
     }
 
     @Override
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("GPSTracker", "onStartCommand");
-        // if we are currently trying to get a location and the alarm manager has called this again,
-        // no need to start processing a new location.
+        Log.d(TAG, "onStartCommand");
+
         if (!currentlyProcessingLocation) {
             currentlyProcessingLocation = true;
             startTracking();
@@ -71,7 +76,7 @@ public class GPSTracker extends Service implements
     }
 
     private void startTracking() {
-        Log.e("GPSTracker", "startTracking");
+        Log.d(TAG, "startTracking");
 
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
@@ -94,18 +99,24 @@ public class GPSTracker extends Service implements
     }
 
     protected void sendLocationDataToWebsite(Location location) {
-        Log.e("GPSTracker", "sendLocationDataToWebsite");
 
-        // formatted for mysql datetime format
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-        Date date = new Date(location.getTime());
+        SharedPreferences settings = getSharedPreferences("com.soellner.gpstracker.prefs", 0);
+        boolean enableService = settings.getBoolean("enableService", false);
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("com.websmithing.gpstracker.prefs", Context.MODE_PRIVATE);
+        //check if service is disabled
+        if (!enableService) {
+            return;
+        }
+
+        Log.d(TAG, "sendLocationDataToWebsite");
+
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences("com.soellner.gpstracker.prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         float totalDistanceInMeters = sharedPreferences.getFloat("totalDistanceInMeters", 0f);
 
+        boolean uploadGPS = false;
         boolean firstTimeGettingPosition = sharedPreferences.getBoolean("firstTimeGettingPosition", true);
 
         if (firstTimeGettingPosition) {
@@ -118,14 +129,34 @@ public class GPSTracker extends Service implements
             float distance = location.distanceTo(previousLocation);
             totalDistanceInMeters += distance;
             editor.putFloat("totalDistanceInMeters", totalDistanceInMeters);
+            if (totalDistanceInMeters > 20.0f) {
+                uploadGPS = true;
+            }
         }
+
 
         editor.putFloat("previousLatitude", (float) location.getLatitude());
         editor.putFloat("previousLongitude", (float) location.getLongitude());
         editor.apply();
 
+        //only send GPS if location has changed
+        if (uploadGPS) {
+            uploadLocation(location);
+
+        } else {
+            Log.d(TAG, "location not changed!");
+        }
+
         GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
         new SendStartingMailTask().execute(gpsInfos);
+
+    }
+
+    private void uploadLocation(Location location) {
+        GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
+        new UploadLocationTask().execute(gpsInfos);
+
+
     }
 
     @Override
@@ -140,8 +171,9 @@ public class GPSTracker extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged");
         if (location != null) {
-            Log.e(TAG, "position: " + location.getLatitude() + ", " + location.getLongitude() + " accuracy: " + location.getAccuracy());
+            Log.d(TAG, "position: " + location.getLatitude() + ", " + location.getLongitude() + " accuracy: " + location.getAccuracy());
 
             // we have our desired accuracy of 500 meters so lets quit this service,
             // onDestroy will be called and stop our location uodates
@@ -165,9 +197,9 @@ public class GPSTracker extends Service implements
      */
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e("GPSTracker", "onConnected");
+        Log.d(TAG, "onConnected");
 
-        locationRequest = LocationRequest.create();
+        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(1000); // milliseconds
         locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -188,7 +220,7 @@ public class GPSTracker extends Service implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "onConnectionFailed");
+        Log.d(TAG, "onConnectionFailed");
 
         stopLocationUpdates();
         stopSelf();
@@ -196,7 +228,7 @@ public class GPSTracker extends Service implements
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.e(TAG, "GoogleApiClient connection has been suspend");
+        Log.d(TAG, "GoogleApiClient connection has been suspend");
     }
 
     private class SendStartingMailTask extends AsyncTask<GpsInfos, Void, Void> {
@@ -207,13 +239,14 @@ public class GPSTracker extends Service implements
             try {
                 String latitude = params[0]._latitude;
                 String longitude = params[0]._longitude;
-                GMailSender sender = new GMailSender("", "!");
+
+                GMailSender sender = new GMailSender("@.net", "!");
                 sender.sendMail("GPS Info send",
                         "Latidude: " + latitude + "  Longitude: " + longitude,
                         "@.net",
-                        "@-.com");
+                        "@-.");
             } catch (Exception e) {
-                Log.e("SendMail", e.getMessage(), e);
+                Log.d("SendMail", e.getMessage(), e);
             }
 
             return null;
@@ -238,5 +271,60 @@ public class GPSTracker extends Service implements
 
 
     }
+
+
+    private class UploadLocationTask extends AsyncTask<GpsInfos, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(GpsInfos... params) {
+
+
+            try {
+                Log.d(TAG, "uploadStart");
+
+                String latitude = params[0]._latitude;
+                String longitude = params[0]._longitude;
+                JSONObject obj = new JSONObject();
+
+                obj.put("latitude", latitude);
+                obj.put("longitude", longitude);
+                SharedPreferences settings = getSharedPreferences("com.soellner.gpstracker.prefs", 0);
+                String username = settings.getString("Username", "");
+                String password = settings.getString("Password", "");
+                obj.put("username", username);
+                obj.put("password", password);
+                Log.d(TAG, "upload User" + username + " pass: " + password + "  Latidude: " + latitude + "  Longitude: " + longitude);
+
+
+                URL url = new URL(SERVER_URL);
+
+                URLConnection connection = url.openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+                out.write(obj.toString());
+                out.close();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+
+                in.close();
+                Log.d(TAG, "upload success");
+
+
+            } catch (Exception e) {
+                Log.e(TAG, "ERROR", e);
+            }
+
+
+            return null;
+        }
+
+
+    }
+
 
 }
