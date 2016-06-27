@@ -67,10 +67,10 @@ public class GPSTracker extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
 
-        if (!currentlyProcessingLocation) {
-            currentlyProcessingLocation = true;
+        //if (!currentlyProcessingLocation) {
+         //   currentlyProcessingLocation = true;
             startTracking();
-        }
+        //}
 
         return START_NOT_STICKY;
     }
