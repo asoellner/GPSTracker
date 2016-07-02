@@ -50,7 +50,7 @@ public class GPSTracker extends Service implements
     // private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
 
     //work
-    private String SERVER_URL = "http://bigbutt.dyndns.org:8080/SampleApp/greeting/saveLocation";
+    private String SERVER_URL = "http://xxx.dyndns.org:8080/SampleApp/greeting/saveLocation";
 
 
     private boolean currentlyProcessingLocation = false;
