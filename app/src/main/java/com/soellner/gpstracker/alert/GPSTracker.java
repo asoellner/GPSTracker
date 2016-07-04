@@ -50,7 +50,7 @@ public class GPSTracker extends Service implements
     // private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
 
     //work
-    private String SERVER_URL = "http://xxx.dyndns.org:8080/SampleApp/greeting/saveLocation";
+    private String SERVER_URL = "http://xxxx.dyndns.org:8080/services/main/saveLocation";
 
 
     private boolean currentlyProcessingLocation = false;
@@ -129,7 +129,7 @@ public class GPSTracker extends Service implements
             float distance = location.distanceTo(previousLocation);
             totalDistanceInMeters += distance;
             editor.putFloat("totalDistanceInMeters", totalDistanceInMeters);
-            if (totalDistanceInMeters > 20.0f) {
+            if (totalDistanceInMeters > 200.0f) {
                 uploadGPS = true;
             }
         }
@@ -142,8 +142,8 @@ public class GPSTracker extends Service implements
         //only send GPS if location has changed
         if (uploadGPS) {
             uploadLocation(location);
-            GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
-            new SendStartingMailTask().execute(gpsInfos);
+            //GpsInfos gpsInfos = new GpsInfos(location.getLatitude() + "", location.getLongitude() + "");
+            //new SendStartingMailTask().execute(gpsInfos);
 
         } else {
             Log.d(TAG, "location not changed!");
