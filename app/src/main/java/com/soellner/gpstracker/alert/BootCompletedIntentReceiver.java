@@ -28,8 +28,10 @@ public class BootCompletedIntentReceiver extends WakefulBroadcastReceiver {
         long timeInMillis = (System.currentTimeMillis() + 1800000) / 1000 * 1000;     //> 30 min
 
         if (SDK_INT < Build.VERSION_CODES.KITKAT) {
+            Log.e("BootReceiver", "Build.VERSION_CODES.KITKAT");
             am.set(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
         } else if (Build.VERSION_CODES.KITKAT <= SDK_INT && SDK_INT < Build.VERSION_CODES.M) {
+            Log.e("BootReceiver", "Build.VERSION_CODES.KITKAT <= SDK_INT && SDK_INT < Build.VERSION_CODES.M");
             am.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
         } else if (SDK_INT >= Build.VERSION_CODES.M) {
             Log.e("BootReceiver", ">=Build.VERSION_CODES.M");
