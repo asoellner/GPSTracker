@@ -50,7 +50,7 @@ public class GPSTracker extends Service implements
     // private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/saveLocation";
 
     //work
-    private String SERVER_URL = "http://xxxx.dyndns.org:8080/services/main/saveLocation";
+    private String SERVER_URL = "http://xxx.dyndns.org:8080/services/main/saveLocation";
 
 
     private boolean currentlyProcessingLocation = false;
@@ -68,8 +68,8 @@ public class GPSTracker extends Service implements
         Log.d(TAG, "onStartCommand");
 
         //if (!currentlyProcessingLocation) {
-         //   currentlyProcessingLocation = true;
-            startTracking();
+        //   currentlyProcessingLocation = true;
+        startTracking();
         //}
 
         return START_NOT_STICKY;
@@ -114,7 +114,7 @@ public class GPSTracker extends Service implements
         SharedPreferences sharedPreferences = this.getSharedPreferences("com.soellner.gpstracker.prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        float totalDistanceInMeters = sharedPreferences.getFloat("totalDistanceInMeters", 0f);
+        //float totalDistanceInMeters = sharedPreferences.getFloat("totalDistanceInMeters", 0f);
 
         boolean uploadGPS = false;
         boolean firstTimeGettingPosition = sharedPreferences.getBoolean("firstTimeGettingPosition", true);
@@ -127,9 +127,10 @@ public class GPSTracker extends Service implements
             previousLocation.setLongitude(sharedPreferences.getFloat("previousLongitude", 0f));
 
             float distance = location.distanceTo(previousLocation);
-            totalDistanceInMeters += distance;
-            editor.putFloat("totalDistanceInMeters", totalDistanceInMeters);
-            if (totalDistanceInMeters > 200.0f) {
+            //totalDistanceInMeters += distance;
+            //editor.putFloat("totalDistanceInMeters", totalDistanceInMeters);
+            Log.d(TAG, "distance=" + distance);
+            if (distance > 300.0f) {
                 uploadGPS = true;
             }
         }
@@ -148,7 +149,6 @@ public class GPSTracker extends Service implements
         } else {
             Log.d(TAG, "location not changed!");
         }
-
 
 
     }
