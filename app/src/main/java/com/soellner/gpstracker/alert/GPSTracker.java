@@ -303,8 +303,8 @@ public class GPSTracker extends Service implements
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(obj.toString());
                 out.close();
