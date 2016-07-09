@@ -121,6 +121,7 @@ public class GPSTracker extends Service implements
 
         if (firstTimeGettingPosition) {
             editor.putBoolean("firstTimeGettingPosition", false);
+            editor.apply();
         } else {
             Location previousLocation = new Location("");
             previousLocation.setLatitude(sharedPreferences.getFloat("previousLatitude", 0f));
@@ -135,10 +136,6 @@ public class GPSTracker extends Service implements
             }
         }
 
-
-        editor.putFloat("previousLatitude", (float) location.getLatitude());
-        editor.putFloat("previousLongitude", (float) location.getLongitude());
-        editor.apply();
 
         //only send GPS if location has changed
         if (uploadGPS) {
@@ -303,8 +300,8 @@ public class GPSTracker extends Service implements
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(10000);
-                connection.setReadTimeout(10000);
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(obj.toString());
                 out.close();
@@ -313,6 +310,13 @@ public class GPSTracker extends Service implements
 
 
                 in.close();
+
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putFloat("previousLatitude", Float.valueOf(latitude));
+                editor.putFloat("previousLongitude", Float.valueOf(longitude));
+                editor.apply();
+
+
                 Log.d(TAG, "upload success");
 
 

@@ -41,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
     //private String SERVER_URL = "http://172.20.3.52:8080/SampleApp/greeting/checkLogin";
 
     //home_server
-    private String SERVER_URL = "http://xxxx.dyndns.org:8080/services/main/checkLogin";
+    private String SERVER_URL = "http://xxx.dyndns.org:8080/services/main/checkLogin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
